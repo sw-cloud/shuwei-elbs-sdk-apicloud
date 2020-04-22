@@ -1,0 +1,229 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title>Hello APP</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css" />
+    <script type="text/javascript" src="../script/api.js"></script>
+    <style>
+        html,
+        body {
+            height: 100%;
+        }
+        
+        #wrap {
+            height: 100%;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-box-orient: vertical;
+            -webkit-flex-flow: column;
+            flex-flow: column;
+        }
+        
+        #header {
+            text-align: center;
+            background-color: #81a9c3;
+            color: #fff;
+            width: 100%;
+        }
+        
+        #header h1 {
+            font-size: 20px;
+            height: 44px;
+            line-height: 44px;
+            margin: 0em;
+            color: #fff;
+        }
+        
+        #main {
+            -webkit-box-flex: 1;
+            -webkit-flex: 1;
+            flex: 1;
+        }
+        
+        #footer {
+            height: 30px;
+            line-height: 30px;
+            background-color: #81a9c3;
+            width: 100%;
+            text-align: center;
+        }
+        
+        #footer h5 {
+            color: white;
+        }
+        
+        .con {
+            font-size: 28px;
+            text-align: center;
+        }
+        
+        .flex-con {
+            overflow: auto
+        }
+        
+        .use-time {
+            margin: 3% 0 3% 5%;
+        }
+        
+        .collect-count {
+            margin: 0 0 0 5%;
+        }
+        
+        .mc-edit {
+            margin: 3% 4% 3% 4%;
+            border: 2px solid #ccc;
+            padding: 1% 1% 1% 1%;
+        }
+        
+        .mc-input {
+            height: 30px;
+            width: 50%;
+            margin: 0 5% 0 0;
+            border-bottom: 1px solid #ccc;
+        }
+        
+        .mc-button-text {
+            height: 36px;
+            width: 90%;
+            font-size: 18px;
+            line-height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #DDD;
+            margin: 0 5% 0 5%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="wrap">
+        <div id="header">
+            <h1>场景识别Demo App</h1>
+        </div>
+        <div id="main" class="flex-con">
+            <p class="mc-text use-time" id="collectTime">采集耗时：</p>
+            <p class="mc-text collect-count" id="successCount">采集成功：</p>
+            <p class="mc-text collect-count" id="failCount">采集失败：</p>
+            <div class='mc-edit'>
+                <label class="mc-label" for="name">POI名称：</label>
+                <input class="mc-input" type="text" name="name" id="name"></text>
+                </br>
+                <label class="mc-label" for="floorName">楼层：</label>
+                <input class="mc-input" type="text" name="floorName" id="floorName"></text>
+                </br>
+                <label class="mc-label" for="building">楼宇名称：</label>
+                <input class="mc-input" type="text" name="building" id="building"></text>
+                </br>
+                <label class="mc-label" for="area">商圈名称：</label>
+                <input class="mc-input" type="text" name="area" id="area"></text>
+                </br>
+                <label class="mc-label" for="address">地址：</label>
+                <input class="mc-input" type="text" name="address" id="address"></text>
+                </br>
+                <label class="mc-label" for="street">街道：</label>
+                <input class="mc-input" type="text" name="street" id="street"></text>
+                </br>
+                <label class="mc-label" for="region">行政区：</label>
+                <input class="mc-input" type="text" name="region" id="region"></text>
+                </br>
+                <label class="mc-label" for="city">城市：</label>
+                <input class="mc-input" type="text" name="city" id="city"></text>
+                </br>
+                <label class="mc-label" for="province">省份：</label>
+                <input class="mc-input" type="text" name="province" id="province"></text>
+                </br>
+                <label class="mc-label" for="ext">自定义扩展字段：</label>
+                <input class="mc-input" type="text" name="ext" id="ext"></text>
+                </br>
+                <label class="mc-label" for="passThrough">透传字段：</label>
+                <input class="mc-input" type="text" name="passThrough" id="passThrough"></text>
+                </br>
+                <label class="mc-label" for="poiId">采集点id：</label>
+                <input class="mc-input" type="text" name="poiId" id="poiId"></text>
+                </br>
+                <label class="mc-label" for="collectorId">采集者id：</label>
+                <input class="mc-input" type="text" name="collectorId" id="collectorId"></text>
+                </br>
+            </div>
+            <button id="submit_collect_btn" class="mc-button-text" onclick="submitCollect()">提交采集数据</button></br>
+        </div>
+        <div id="footer">
+            <h5>Copyright &copy;<span id="year"></span> </h5>
+        </div>
+    </div>
+</body>
+<script type="text/javascript">
+    "use strict";
+
+    var swLocate = null;
+    var startTime = 0;
+    var endTime = 0;
+    var successCount = 0;
+    var failCount = 0;
+
+    var apiready = function() {
+        //适配iOS 7+，Android 4.4+状态栏
+        $api.fixStatusBar(header);
+
+        var year = $api.byId('year');
+        year.innerHTML = new Date().getFullYear();
+
+        swLocate = api.require("swLocate");
+    }
+
+    /*
+     * 提交采集的数据，该接口内部会将用户输入的位置信息和采集设备（手机）当前采集到的信号数据上传到数位云服务器。
+     * 之后定位时会先将定位设备（手机）采集到信号数据上传到数位云服务器进行信号匹配，如果匹配上了，就会把对应的位置信息返回。
+     */
+    function submitCollect() {
+        startTime = (new Date()).getTime();
+        var name = $api.byId('name').value;
+        var floorName = $api.byId('floorName').value;
+        var building = $api.byId('building').value;
+        var area = $api.byId('area').value;
+        var address = $api.byId('address').value;
+        var street = $api.byId('street').value;
+        var region = $api.byId('region').value;
+        var city = $api.byId('city').value;
+        var province = $api.byId('province').value;
+        var ext = $api.byId('ext').value;
+        var passThrough = $api.byId('passThrough').value;
+        var poiId = $api.byId('poiId').value;
+        var collectorId = $api.byId('collectorId').value;
+        swLocate.submitCollectData({
+            name: name,
+            floorName: floorName,
+            building: building,
+            area: area,
+            address: address,
+            street: street,
+            region: region,
+            city: city,
+            province: province,
+            ext: ext,
+            passThrough: passThrough,
+            poiId: poiId,
+            collectorId: collectorId
+        }, function(ret, err) {
+            endTime = (new Date()).getTime();
+            if (ret) {
+                successCount++;
+                alert(JSON.stringify(ret))
+            } else {
+                failCount++;
+                alert(JSON.stringify(err));
+            }
+            $api.byId('collectTime').innerHTML = "采集耗时：" + (endTime - startTime) + "ms";
+            $api.byId('successCount').innerHTML = "采集成功：" + successCount + "次";
+            $api.byId('failCount').innerHTML = "采集失败：" + failCount + "次";
+        })
+    }
+</script>
+
+</html>

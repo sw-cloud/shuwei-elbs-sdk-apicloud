@@ -1,0 +1,203 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title>Hello APP</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css" />
+    <script type="text/javascript" src="../script/api.js"></script>
+    <script type="text/javascript" src="../script/timeutils.js"></script>
+    <style>
+        html,
+        body {
+            height: 100%;
+        }
+        
+        #wrap {
+            height: 100%;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-box-orient: vertical;
+            -webkit-flex-flow: column;
+            flex-flow: column;
+        }
+        
+        #header {
+            text-align: center;
+            background-color: #81a9c3;
+            color: #fff;
+            width: 100%;
+        }
+        
+        #header h1 {
+            font-size: 20px;
+            height: 44px;
+            line-height: 44px;
+            margin: 0em;
+            color: #fff;
+        }
+        
+        #main {
+            -webkit-box-flex: 1;
+            -webkit-flex: 1;
+            flex: 1;
+        }
+        
+        #footer {
+            height: 30px;
+            line-height: 30px;
+            background-color: #81a9c3;
+            width: 100%;
+            text-align: center;
+        }
+        
+        #footer h5 {
+            color: white;
+        }
+        
+        .con {
+            font-size: 28px;
+            text-align: center;
+        }
+        
+        .flex-con {
+            overflow: auto
+        }
+        
+        .btn-container {
+            margin-left: 5%;
+            width: 90%;
+            margin-top: 3%;
+            height: 30px;
+        }
+        
+        .mc-button-text {
+            float: left;
+            background-color: #ddd;
+            margin-left: 6%;
+            width: 41%;
+            height: 30px;
+        }
+        
+        .locate-item {
+            margin: 3% 3% 1% 3%;
+            padding: 1% 1% 0 1%;
+            position: relative;
+            border-top: 1px solid #ccc;
+        }
+        
+        .locate-name {
+            font-size: 16px;
+            line-height: 16px;
+            margin: 4px 0 0 0;
+        }
+        
+        .locate-area {
+            font-size: 13px;
+            line-height: 13px;
+            margin: 6px 0 0 0;
+        }
+        
+        .locate-address {
+            font-size: 13px;
+            line-height: 13px;
+            margin: 6px 0 0 0;
+        }
+        
+        .locate-latlng {
+            font-size: 13px;
+            line-height: 13px;
+            margin: 6px 0 0 0;
+        }
+        
+        .locate-time {
+            font-size: 13px;
+            line-height: 13px;
+            margin: 6px 0 0 0;
+            right: 1%;
+            position: absolute;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="wrap">
+        <div id="header">
+            <h1>场景识别Demo App</h1>
+        </div>
+        <div id="main" class="flex-con">
+            <div class="btn-container">
+                <button id="start_cycle_locate_btn" class="mc-button-text" onclick="startCycleLocate()">启动周期定位</button>
+                <button id="stop_cycle_locate_btn" class="mc-button-text" onclick="stopCycleLocate()">停止周期定位</button></br>
+            </div>
+            <div class="locate-container" id="container">
+                <!-- <div class="locate-item">
+                    <label class="locate-name">1. 数位科技</label></br>
+                    <label class="locate-area">商圈：彩讯科创中心</label></br>
+                    <label class="locate-address">详细地址：</label></br>
+                    <label class="locate-latlng">经纬度：</label>
+                    <label class="locate-time">时间：</label>
+                </div> -->
+            </div>
+        </div>
+        <div id="footer">
+            <h5>Copyright &copy;<span id="year"></span> </h5>
+        </div>
+    </div>
+</body>
+<script type="text/javascript">
+    "use strict";
+
+    var swLocate = null;
+    var locateSuccessCount = 0;
+
+    var apiready = function() {
+        //适配iOS 7+，Android 4.4+状态栏
+        $api.fixStatusBar(header);
+
+        var year = $api.byId('year');
+        year.innerHTML = new Date().getFullYear();
+
+        swLocate = api.require("swLocate");
+    }
+
+    /*
+     * 开启周期定位功能
+     */
+    function startCycleLocate() {
+        swLocate.startCycleLocate({
+            ext: "ext22",
+            passThrough: "pt22"
+        }, function(ret, err) {
+            if (ret) {
+                locateSuccessCount++;
+                var time = new Date(ret.timestamp);
+                var formatTime = dateFtt("yyyy-MM-dd hh:mm:ss", time);
+                var item = `<div class="locate-item">
+                    <label class="locate-name">${locateSuccessCount}. ${ret.name}</label></br>
+                    <label class="locate-area">商圈：${ret.area} (${ret.floorName}楼)</label></br>
+                    <label class="locate-address">详细地址：${ret.address}</label></br>
+                    <label class="locate-latlng">经纬度：${ret.latitude} / ${ret.longitude}</label>
+                    <label class="locate-time">${formatTime}</label>
+                </div>`;
+                var content = $api.byId('container').innerHTML;
+                $api.byId('container').innerHTML = item + content;
+                alert(JSON.stringify(ret));
+            } else {
+                alert(JSON.stringify(err));
+            }
+        });
+    }
+
+    /*
+     * 停止周期定位功能
+     */
+    function stopCycleLocate() {
+        swLocate.stopCycleLocate();
+    }
+</script>
+
+</html>

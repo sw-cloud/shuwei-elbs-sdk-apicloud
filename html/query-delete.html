@@ -1,0 +1,332 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title>Hello APP</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css" />
+    <script type="text/javascript" src="../script/api.js"></script>
+    <script type="text/javascript" src="../script/timeutils.js"></script>
+    <style>
+        html,
+        body {
+            height: 100%;
+        }
+        
+        #wrap {
+            height: 100%;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-box-orient: vertical;
+            -webkit-flex-flow: column;
+            flex-flow: column;
+        }
+        
+        #header {
+            text-align: center;
+            background-color: #81a9c3;
+            color: #fff;
+            width: 100%;
+            position: fixed;
+            top: 0;
+        }
+        
+        #header h1 {
+            font-size: 20px;
+            height: 44px;
+            line-height: 44px;
+            margin: 0em;
+            color: #fff;
+        }
+        
+        #main {
+            -webkit-box-flex: 1;
+            -webkit-flex: 1;
+            flex: 1;
+            margin: 76px 0 82px 0;
+        }
+        
+        #footer {
+            height: 30px;
+            line-height: 30px;
+            background-color: #81a9c3;
+            width: 100%;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+        }
+        
+        #footer h5 {
+            color: white;
+        }
+        
+        .con {
+            font-size: 28px;
+            text-align: center;
+        }
+        
+        .flex-con {
+            overflow: auto display: -webkit-box;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-box-orient: vertical;
+            -webkit-flex-flow: column;
+            flex-flow: column;
+        }
+        
+        .mc-edit {
+            margin: 3% 4% 3% 4%;
+            border: 2px solid #ccc;
+            padding: 1% 1% 1% 1%;
+        }
+        
+        .mc-input {
+            height: 30px;
+            width: 50%;
+            margin: 0 5% 0 0;
+            border-bottom: 1px solid #ccc;
+        }
+        
+        .mc-button-text {
+            height: 36px;
+            width: 90%;
+            font-size: 18px;
+            line-height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #DDD;
+            margin: 0% 5% 0 5%;
+        }
+        
+        #container {
+            -webkit-box-flex: 1;
+            -webkit-flex: 1;
+            flex: 1;
+        }
+        
+        .result-item {
+            margin: 1% 3% 1% 3%;
+            padding: 1% 1% 0 1%;
+            position: relative;
+            border-top: 1px solid #ccc;
+        }
+        
+        .poi-name {
+            font-size: 16px;
+            line-height: 16px;
+            margin: 4px 0 0 0;
+        }
+        
+        .poi-area {
+            font-size: 13px;
+            line-height: 13px;
+            margin: 6px 0 0 0;
+        }
+        
+        .poi-address {
+            font-size: 13px;
+            line-height: 13px;
+            margin: 6px 0 0 0;
+        }
+        
+        .poi-latlng {
+            font-size: 13px;
+            line-height: 13px;
+            margin: 6px 0 0 0;
+        }
+        
+        .poi-time {
+            font-size: 13px;
+            line-height: 13px;
+            margin: 6px 0 0 0;
+            right: 1%;
+            position: absolute;
+        }
+        
+        .query-result {
+            right: 1%;
+            top: 42px;
+            position: absolute;
+        }
+        
+        .delete {
+            padding: 8px 0 8px 0;
+            position: fixed;
+            bottom: 30px;
+            width: 100%;
+            height: 36px;
+            background: #FFF;
+        }
+        
+        .mc-delete-button-text {
+            width: 41%;
+            height: 36px;
+            line-height: 36px;
+            margin: 0 0 0 6%;
+            background: #DDD;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="wrap">
+        <div id="header">
+            <h1>场景识别Demo App</h1>
+        </div>
+        <div id="main" class="flex-con">
+            <div class='mc-edit'>
+                <label class="mc-label" for="pageOffset">当前页：</label>
+                <input class="mc-input" type="text" name="pageOffset" id="pageOffset"></text>
+                </br>
+                <label class="mc-label" for="floorName">每页条数：</label>
+                <input class="mc-input" type="text" name="pageSize" id="pageSize"></text>
+                </br>
+                <label class="mc-label" for="passThrough">透传字段：</label>
+                <input class="mc-input" type="text" name="passThrough" id="passThrough"></text>
+                </br>
+                <label class="mc-label" for="collectorId">采集者id：</label>
+                <input class="mc-input" type="text" name="collectorId" id="collectorId"></text>
+                </br>
+            </div>
+            <button id="query_collect_btn" class="mc-button-text" onclick="queryCollectData()">查询采集数据</button></br>
+            <div class="result-container" id="container">
+                <!-- <div class="result-item">
+                    <label class="poi-name">1. 数位科技</label>
+                    <label class="poi-time">时间</label></br>
+                    <label class="poi-area">商圈：彩讯科创中心</label>
+                    <input class="query-result" name="query-result-item" type="checkbox"/></br>
+                    <label class="poi-address">详细地址：</label></br>
+                    <label class="poi-latlng">经纬度：</label>
+                </div> -->
+            </div>
+            <div class="delete">
+                <button id="select_all_btn" class="mc-delete-button-text" onclick="selectAll()">全选</button>
+                <button id="delete_btn" class="mc-delete-button-text" onclick="deleteSelect()">删除</button></br>
+            </div>
+        </div>
+        <div id="footer">
+            <h5>Copyright &copy;<span id="year"></span> </h5>
+        </div>
+    </div>
+</body>
+<script type="text/javascript">
+    "use strict";
+
+    var swLocate = null;
+    var startTime = 0;
+    var endTime = 0;
+    var locateSuccessCount = 0;
+    var hasSelectAll = false;
+
+    var apiready = function() {
+        //适配iOS 7+，Android 4.4+状态栏
+        $api.fixStatusBar(header);
+
+        var year = $api.byId('year');
+        year.innerHTML = new Date().getFullYear();
+
+        swLocate = api.require("swLocate");
+    }
+
+    /*
+     * 查询采集过的数据，可以通过 collectorId 字段对采集者进行权限区分和控制。
+     * collectorId 字段不传的话，默认以设备唯一标识作为采集者id字段的值。
+     */
+    function queryCollectData() {
+        var pageOffset = $api.byId('pageOffset').value;
+        var pageSize = $api.byId('pageSize').value;
+        var passThrough = $api.byId('passThrough').value;
+        var collectorId = $api.byId('collectorId').value;
+        swLocate.queryCollectData({
+            pageOffset: pageOffset,
+            pageSize: pageSize,
+            passThrough: passThrough,
+            collectorId: collectorId
+        }, function(ret, err) {
+            if (ret) {
+                var content = "";
+                var poiPoints = ret.poiPoints;
+                if (poiPoints && poiPoints.length > 0) {
+                    for (var i = 0; i < poiPoints.length; i++) {
+                        var poi = poiPoints[i];
+                        //获取poi点中的采集点，一个poi点可能对应多个采集点
+                        var collocPoint = poi.collectPoints[0];
+                        var time = new Date(poi.timestamp);
+                        var formatTime = dateFtt("yyyy-MM-dd hh:mm:ss", time);
+                        var item = `<div class="result-item">
+                            <label class="poi-name">${i + 1}. ${poi.name}</label>
+                            <label class="poi-time">${formatTime}</label></br>
+                            <label class="poi-area">商圈：${poi.area}</label>
+                            <input class="query-result" name="query-result-item" type="checkbox" value="${poi.poiId}"/></br>
+                            <label class="poi-address">详细地址：${poi.address}</label></br>
+                            <label class="poi-latlng">经纬度：${collocPoint.latitude} / ${collocPoint.longitude}</label>
+                        </div>`;
+                        content += item;
+                    }
+                }
+                $api.byId('container').innerHTML = content;
+                alert(JSON.stringify(ret))
+            } else {
+                alert(JSON.stringify(err));
+            }
+        });
+    }
+
+    /*
+     * 全选或者反选查询出来的采集结果
+     */
+    function selectAll() {
+        var queryItems = document.getElementsByName("query-result-item");
+        if (queryItems && queryItems.length > 0) {
+            if (hasSelectAll) {
+                for (var i = 0; i < queryItems.length; i++) {
+                    queryItems[i].checked = false;
+                    hasSelectAll = false;
+                }
+            } else {
+                for (var i = 0; i < queryItems.length; i++) {
+                    queryItems[i].checked = true;
+                    hasSelectAll = true;
+                }
+            }
+
+        }
+    }
+
+    /*
+     * 删除选中的采集结果
+     */
+    function deleteSelect() {
+        var deleteItems = [];
+        var queryItems = document.getElementsByName("query-result-item");
+        if (queryItems && queryItems.length > 0) {
+            for (var i = 0; i < queryItems.length; i++) {
+                if (queryItems[i].checked) {
+                    deleteItems.push(queryItems[i].value);
+                }
+            }
+        }
+        swLocate.deleteCollectData({
+            poiIds: deleteItems
+        }, function(ret, err) {
+            if (ret) {
+                var queryItems = document.getElementsByName("query-result-item");
+                for (var i = 0; i < queryItems.length; i++) {
+                    if (queryItems[i].checked) {
+                        queryItems[i].parentNode.remove();
+                        i--;
+                    }
+                }
+                alert(JSON.stringify(ret))
+            } else {
+                alert(JSON.stringify(err));
+            }
+        });
+    }
+</script>
+
+</html>

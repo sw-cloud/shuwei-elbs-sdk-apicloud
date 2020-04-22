@@ -1,0 +1,168 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0, minimum-scale=1.0, user-scalable=0, initial-scale=1.0, width=device-width" />
+    <meta name="format-detection" content="telephone=no, email=no, date=no, address=no">
+    <title>场景识别Demo App</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css" />
+    <script type="text/javascript" src="../script/api.js"></script>
+    <style>
+        .mc-text {
+            height: auto;
+            width: 90%;
+            margin: 3% 5% 3% 5%;
+        }
+
+        .mc-button {
+            height: 48px;
+            width: 100%;
+        }
+
+        .mc-button-text {
+            height: 36px;
+            width: 90%;
+            font-size: 18px;
+            line-height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #DDD;
+            margin: 0 5% 0 5%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mc-text">
+        <p>使用说明：</p>
+        <p>1. 在使用SDK之前，先初始化SDK</p>
+        <p>2. 在使用任何功能之前，先启动服务</p>
+        <p>3. 在不需要使用任何功能之后，可以停止服务</p>
+    </div>
+    <div class="mc-button">
+        <button id="init_btn" class=" mc-button-text" onclick="initLocateSDK()">初始化SDK</button><br/>
+    </div>
+    <div class="mc-button">
+        <button id="start_service_btn" class="mc-button-text" onclick="startService()">启动服务</button><br/>
+    </div>
+    <div class="mc-button">
+        <button id="stop_service_btn" class="mc-button-text" onclick="stopService()">停止服务</button><br/>
+    </div>
+    <div class="mc-button">
+        <button id="goto_locate_btn" class="mc-button-text" onclick="gotoLocatePage()">进入主动定位页面</button><br/>
+    </div>
+    <div class="mc-button">
+        <button id="goto_cycle_locate_btn" class="mc-button-text" onclick="gotoCycleLocatePage()">进入周期定位页面</button><br/>
+    </div>
+    <div class="mc-button">
+        <button id="goto_collect_btn" class="mc-button-text" onclick="gotoCollectPage()">进入采集页面</button><br/>
+    </div>
+    <div class="mc-button">
+        <button id="goto_query_delete_btn" class="mc-button-text" onclick="gotoQueryDeletePage()">进入查询删除页面</button><br/>
+    </div>
+</body>
+<script type="text/javascript">
+    "use strict";
+    var swLocate = null;
+    var swServiceStarted = false;
+    var yOffset = 0;
+    var mainHeight = 0;
+
+    var apiready = function() {
+        swLocate = api.require("swLocate");
+    }
+
+    /*
+     * 初始化场景识别SDK
+     */
+    function initLocateSDK() {
+        swLocate.initLocateSDK({
+            debug: true //开启模块内部的调试日志
+        });
+    }
+
+    /*
+     * 启动服务
+     */
+    function startService() {
+        swLocate.startService(function(ret) {
+            // alert(JSON.stringify(ret));
+            if (ret.status) {
+                swServiceStarted = true;
+                alert("服务启动成功");
+            } else {
+                alert("服务启动失败");
+            }
+        });
+    }
+
+    /*
+     * 停止服务
+     */
+    function stopService() {
+        swLocate.stopService();
+        swServiceStarted = false;
+    }
+
+    /*
+     * 进入主动定位页面，即每点击一次定位按钮，进行一次定位
+     */
+    function gotoLocatePage() {
+        if (swServiceStarted) {
+            api.openWin({
+                name: 'locate',
+                url: './locate.html'
+            });
+        } else {
+            alert("服务还没有启动");
+        }
+    }
+
+    /*
+     * 进入周期定位页面，开启周期定位后，会每隔一段时间自动定位一次，一直持续直到停止周期定位或者停止服务。
+     * 定位的间隔时间默认是5分钟，可以由数位云后台配置
+     */
+    function gotoCycleLocatePage() {
+        if (swServiceStarted) {
+            api.openWin({
+                name: 'cycle-locate',
+                url: './cycle-locate.html'
+            });
+        } else {
+            alert("服务还没有启动");
+        }
+    }
+
+    /*
+     * 进入采集页面，其中POI名称字段是必传字段
+     * 点击采集数据按钮时，请保持采集设备（手机）静止，确保信号稳定
+     */
+    function gotoCollectPage() {
+        if (swServiceStarted) {
+            api.openWin({
+                name: 'collect',
+                url: './collect.html'
+            });
+        } else {
+            alert("服务还没有启动");
+        }
+    }
+
+    /*
+     * 进入采集查询和删除页面
+     */
+    function gotoQueryDeletePage() {
+        if (swServiceStarted) {
+            api.openWin({
+                name: 'query-delete',
+                url: './query-delete.html'
+            });
+        } else {
+            alert("服务还没有启动");
+        }
+    }
+</script>
+
+</html>
